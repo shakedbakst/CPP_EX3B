@@ -8,16 +8,13 @@
 using namespace ariel;
 using namespace std;
 
-/*
-// Constructors - final
+
+// Constructors 
 Fraction::Fraction() : numerator(0), denominator(1) {}
 
 Fraction::Fraction(int numerator, int denominator) {
     if (denominator == 0) {
         throw std::invalid_argument("The denominator can not be 0");
-    }
-    if (numerator > INT_MAX || denominator > INT_MAX) {
-        throw std::overflow_error("ERROR- overflow");
     }
     if (denominator < 0){
         this ->numerator = -1* numerator;
@@ -31,15 +28,12 @@ Fraction::Fraction(int numerator, int denominator) {
 
 }
 
-
- Fraction::Fraction(float number) {
-    this->numerator = static_cast<int>(std::round(numerator * 1000));
-    this->denominator = 1000;
+Fraction::Fraction(float number) : numerator(std::round(number * 1000)), denominator(1000) {
     reduce();
 }
 
 
-
+//Help functions
 int Fraction::getGCD(int numerator, int denominator) {
     int absNumerator = std::abs(numerator);
     int absDenominator = std::abs(denominator);
@@ -62,7 +56,7 @@ void Fraction :: reduce(){
 
 
 
-// Getters and Setters - final
+// Getters and Setters 
 int Fraction::getNumerator() const{
     return this->numerator;
 }
@@ -82,107 +76,106 @@ void Fraction::setDenominator(int denominator){
 }
 
 
-//arithmetic operators - final
-Fraction Fraction::operator+(const Fraction& other) const{
-    long num = static_cast<long>(this->numerator) * other.denominator + static_cast<long>(other.numerator) * this->denominator;
-    long denom = static_cast<long>(this->denominator) * other.denominator;
-    if (num < INT_MIN || denom < INT_MIN || num > INT_MAX || denom > INT_MAX) {
-        throw std::overflow_error("One of the numerator or denominator are too short or too long");
+//arithmetic operators 
+Fraction Fraction::operator+(const Fraction& other) const {
+    long long num = static_cast<long long>(numerator) * other.denominator + static_cast<long long>(other.numerator) * denominator;
+    long long denom = static_cast<long long>(denominator) * other.denominator;
+
+    if (num < std::numeric_limits<int>::min() || denom < std::numeric_limits<int>::min() || num > std::numeric_limits<int>::max() || denom > std::numeric_limits<int>::max()) {
+        throw std::overflow_error("One of the numerator or denominator is too short or too long");
     }
-   return Fraction((int)num, (int)denom);
+
+    return Fraction(static_cast<int>(num), static_cast<int>(denom));
 }
 
-Fraction operator+(const Fraction& fraction , float num){
-    Fraction ans(num);
-    return fraction + ans;  
+Fraction operator+(const Fraction& fraction, float num) {
+    return fraction + Fraction(num);
 }
 
-Fraction operator+(float num, const Fraction &fraction) {
-    int numerator = std::round(num * fraction.getDenominator()) + fraction.getNumerator();
-    int denominator = fraction.getDenominator();
-    return Fraction(numerator, denominator);
+Fraction operator+(float num, const Fraction& fraction) {
+    return Fraction(num) + fraction;
 }
 
+Fraction Fraction::operator-(const Fraction& other) const {
+    long long num = static_cast<long long>(numerator) * other.denominator - static_cast<long long>(other.numerator) * denominator;
+    long long denom = static_cast<long long>(denominator) * other.denominator;
 
-Fraction Fraction::operator-(const Fraction& other) const{
-    long num = static_cast<long>(this->numerator) * other.denominator + static_cast<long>(other.numerator) * this->denominator;
-    long denom = static_cast<long>(this->denominator) * other.denominator;
-    if (num < INT_MIN || denom < INT_MIN || num > INT_MAX || denom > INT_MAX) {
-        throw std::overflow_error("One of the numerator or denominator are too short or too long");
+    if (num < std::numeric_limits<int>::min() || denom < std::numeric_limits<int>::min() || num > std::numeric_limits<int>::max() || denom > std::numeric_limits<int>::max()) {
+        throw std::overflow_error("One of the numerator or denominator is too short or too long");
     }
-   return Fraction((int)num, (int)denom);
+
+    return Fraction(static_cast<int>(num), static_cast<int>(denom));
 }
 
 Fraction operator-(const Fraction& fraction , float num){
-    Fraction ans(num);
-    return fraction - ans;  
+    return fraction - Fraction(num);  
 }
 
 Fraction operator-(float num, const Fraction &fraction) {
-    int numerator = std::round(num * fraction.getDenominator()) - fraction.getNumerator();
-    int denominator = fraction.getDenominator();
-    return Fraction(numerator, denominator);
+    return Fraction(num) - fraction;
 }
 
-Fraction Fraction::operator*(const Fraction& other) const{
-    long num = static_cast<long>(this->numerator) * other.numerator;
-    long denom = static_cast<long>(this->denominator) * other.denominator;
-    if (num < INT_MIN || denom < INT_MIN || num > INT_MAX || denom > INT_MAX) {
-        throw std::overflow_error("One of the numerator or denominator are too short or too long");
+Fraction Fraction::operator*(const Fraction& other) const {
+    long long num = static_cast<long long>(numerator) * other.numerator;
+    long long denom = static_cast<long long>(denominator) * other.denominator;
+
+    if (num < std::numeric_limits<int>::min() || denom < std::numeric_limits<int>::min() || num > std::numeric_limits<int>::max() || denom > std::numeric_limits<int>::max()) {
+        throw std::overflow_error("One of the numerator or denominator is too short or too long");
     }
-   return Fraction((int)num, (int)denom);
+
+    return Fraction(static_cast<int>(num), static_cast<int>(denom));
 }
 
 Fraction operator*(const Fraction &frac, float num){
-    Fraction ans(num);
-    return frac*ans;
+    return frac * Fraction(num);
 }
 
-Fraction operator*(float num, const Fraction &frc) {
-    int numerator = std::round(num * frc.getNumerator());
-    int denominator = frc.getDenominator();
-    return Fraction(numerator, denominator);
+Fraction operator*(double num, const Fraction &frac){
+    return Fraction(num) * frac;
 }
 
-Fraction Fraction::Fraction::operator/(const Fraction& other) const{
-    if(other.numerator == 0){
-        throw std:: runtime_error("The denominator can not be 0");
+Fraction Fraction::operator/(const Fraction& other) const {
+    if (other.numerator == 0) {
+        throw std::runtime_error("The denominator cannot be 0");
     }
-    long num = static_cast<long>(this->numerator) * static_cast<long>(other.numerator);
-    long denom = static_cast<long>(this->denominator) * static_cast<long>(other.numerator);
-    if (num < INT_MIN || denom < INT_MIN || num > INT_MAX || denom > INT_MAX) {
-        throw std::overflow_error("One of the numerator or denominator are too short or too long");
+
+    long long num = static_cast<long long>(numerator) * static_cast<long long>(other.denominator);
+    long long denom = static_cast<long long>(denominator) * static_cast<long long>(other.numerator);
+
+    if (num < std::numeric_limits<int>::min() || denom < std::numeric_limits<int>::min() || num > std::numeric_limits<int>::max() || denom > std::numeric_limits<int>::max()) {
+        throw std::overflow_error("One of the numerator or denominator is too short or too long");
     }
-   return Fraction((int)num, (int)denom);
+
+    return Fraction(static_cast<int>(num), static_cast<int>(denom));
 }
 
 Fraction operator/(float num, const Fraction &frac) {
     if (frac.getNumerator() == 0) {
         throw std::runtime_error("The denominator cannot be 0");
     }
-    return Fraction(num * frac.getDenominator(), frac.getNumerator());
+    return Fraction(num) / frac;
 }
 
 Fraction operator/(const Fraction &frac, float num) {
     if (num == 0) {
         throw std::runtime_error("The denominator can not be 0");
     }
-    return Fraction(frac.getNumerator(), frac.getDenominator() * num);
+    return frac / Fraction(num);
 }
 
-//comparison operators - final
+
+//comparison operators 
 bool Fraction::operator==(const Fraction& frc) const {
-    if (this->numerator == 0 && frc.getNumerator() == 0) {
+    if (numerator == 0 && frc.numerator == 0) {
         return true;
     }
-    return (this->numerator * frc.getDenominator() == frc.getNumerator() * this->denominator);
+    return (numerator * frc.denominator == frc.numerator * denominator);
 }
 
-
 bool Fraction::operator==(const float& num) const {
-    double ans = std::round(static_cast<double>(this->numerator) / this->denominator * 1000) / 1000.0;
+    double thisValue = static_cast<double>(numerator) / denominator;
     double numRounded = std::round(num * 1000) / 1000.0;
-    return (ans == numRounded);
+    return (std::abs(thisValue - numRounded) < 0.0001);
 }
 
 bool Fraction::operator>(const Fraction& other) const {
@@ -247,62 +240,34 @@ bool operator<=(float num, const Fraction& frac) {
 bool operator<=(const Fraction& fraction, float num) {
     float fracValue = static_cast<float>(fraction.getNumerator()) / static_cast<float>(fraction.getDenominator());
     return fracValue <= num;
-}*/
-
-//increment and decrement methods - final
-/*Fraction& Fraction::operator++(){
-    numerator = this->numerator + this->denominator;
-    return *this;
 }
-Fraction Fraction::operator++(int){
-    Fraction result(*this);
-    numerator = this->numerator + this->denominator;
-    return result;
-}
-Fraction& Fraction::operator--(){
-    numerator = this->numerator - this->denominator;
-    return *this;
-}
-Fraction Fraction::operator--(int){
-    Fraction result(*this);
-    numerator = this->numerator - this->denominator;
-    return result;
-}*/
 
 
-
-/*Fraction& Fraction::operator++() {
+//increment and decrement methods 
+Fraction& Fraction::operator++() {
     numerator += denominator;
-    reduce();
     return *this;
 }
-
 
 Fraction Fraction::operator++(int) {
-    Fraction frc(*this); // Create a copy of the current fraction
-    numerator += denominator; // Increment the numerator
-    reduce(); // Simplify the fraction
-    return frc; // Return the copy (the original fraction)
+    Fraction result(*this);
+    operator++();
+    return result;
 }
-
-
 
 Fraction& Fraction::operator--() {
     numerator -= denominator;
-    reduce();
     return *this;
 }
 
-
-
 Fraction Fraction::operator--(int) {
-    Fraction frc(*this); // Create a copy of the current fraction
-    numerator -= denominator; // Increment the numerator
-    reduce(); // Simplify the fraction
-    return frc; // Return the copy (the original fraction)
+    Fraction result(*this);
+    operator--();
+    return result;
 }
-///////////
 
+
+//String operators
 std::ostream& operator<<(std::ostream& oss, const Fraction& fraction){
     oss << fraction.getNumerator() << "/" << fraction.getDenominator();
     return oss;
@@ -311,317 +276,25 @@ std::ostream& operator<<(std::ostream& oss, const Fraction& fraction){
 std::istream& operator>>(std::istream& iss, Fraction& frc) {
     int numerator, denominator;
     
-    if (iss.peek() == EOF) {
+    if (!(iss >> numerator)) {
         throw std::runtime_error("No numbers entered!");
     }
     
-    iss >> numerator;
-    
-    if (iss.peek() == EOF) {
+    if (!(iss >> denominator)) {
         throw std::runtime_error("Please add another number");
     }
     
-    iss >> denominator;
+    if (denominator == 0) {
+        throw std::runtime_error("The denominator cannot be 0");
+    }
     
     if (denominator < 0) {
-        numerator = -1 * numerator;
-        denominator = -1 * denominator;
+        numerator = -numerator;
+        denominator = -denominator;
     }
     
     frc.setNumerator(numerator);
     frc.setDenominator(denominator);
     
     return iss;
-   
-}*/
-
-Fraction::Fraction() : numerator(0), denominator(1) {}
-
-Fraction::Fraction(int numerator, int denominator) : numerator(numerator), denominator(denominator) {
-    if (denominator == 0 && numerator != 0) {
-        throw std::invalid_argument("Denominator can't be 0");
-    }
-    if (numerator > INT_MAX || denominator > INT_MAX) {
-        throw std::overflow_error("Num is too large, should be an int");
-    }
-    if (denominator < 0) {
-        this->numerator = -numerator;
-        this->denominator = -denominator;
-    }
-    reduce();
 }
-
-Fraction::Fraction(float numerator) {
-    int roundedNumerator = static_cast<int>(std::round(numerator * 1000));
-    this->numerator = roundedNumerator;
-    this->denominator = 1000;
-    reduce();
-}
-
-int Fraction::getNumerator() const {
-    return numerator;
-}
-
-int Fraction::getDenominator() const {
-    return denominator;
-}
-
-void Fraction::setNumerator(int newNumerator) {
-    numerator = newNumerator;
-}
-
-void Fraction::setDenominator(int newDenominator) {
-    if (newDenominator == 0) {
-        throw std::runtime_error("Denominator cannot be zero");
-    }
-    denominator = newDenominator;
-}
-
-int Fraction::getGCD(int a, int b) {
-    a = abs(a);
-    b = abs(b);
-    while (b != 0) {
-        int temp = b;
-        b = a % b;
-        a = temp;
-    }
-    return a;
-}
-
-void Fraction::reduce() {
-    int gcd = getGCD(numerator, denominator);
-    numerator /= gcd;
-    denominator /= gcd;
-}
-
-Fraction Fraction::operator+(const Fraction& frc) const {
-    long long check1 = static_cast<long long>(numerator) * frc.getDenominator() + static_cast<long long>(frc.getNumerator()) * denominator;
-    long long check2 = static_cast<long long>(denominator) * frc.getDenominator();
-    if (check1 > INT_MAX || check2 > INT_MAX || check1 < INT_MIN || check2 < INT_MIN) {
-        throw std::overflow_error("Note we're using INTEGERS");
-    }
-    int num = numerator * frc.getDenominator() + frc.getNumerator() * denominator;
-    int den = denominator * frc.getDenominator();
-    return Fraction(num, den);
-}
-
-Fraction Fraction::operator+(float num) {
-    Fraction ans(num);
-    return *this + ans;
-}
-
-Fraction operator+(float num, const Fraction& frc) {
-    Fraction ans(num);
-    return ans + frc;
-}
-
-Fraction Fraction::operator-(const Fraction& frc) {
-    long long check1 = static_cast<long long>(numerator) * frc.getDenominator() - static_cast<long long>(frc.getNumerator()) * denominator;
-    long long check2 = static_cast<long long>(denominator) * frc.getDenominator();
-    if (check1 > INT_MAX || check2 > INT_MAX || check1 < INT_MIN || check2 < INT_MIN) {
-        throw std::overflow_error("Note we're using INTEGERS");
-    }
-    int num = numerator * frc.getDenominator() - frc.getNumerator() * denominator;
-    int den = denominator * frc.getDenominator();
-    return Fraction(num, den);
-}
-
-float Fraction::operator-(float num) {
-    float numerator = this->numerator - num * this->denominator;
-    return numerator / this->denominator;
-}
-
-Fraction operator-(float num, const Fraction& frc) {
-    Fraction ans(num);
-    return ans - frc;
-}
-
-Fraction operator-(const Fraction& frc, float num) {
-    Fraction ans(num);
-    return frc - ans;
-}
-
-Fraction Fraction::operator*(const Fraction& frc) {
-    long long check1 = static_cast<long long>(numerator) * frc.getNumerator();
-    long long check2 = static_cast<long long>(denominator) * frc.getDenominator();
-    if (check1 > INT_MAX || check2 > INT_MAX || check1 < INT_MIN || check2 < INT_MIN) {
-        throw std::overflow_error("Note we're using INTEGERS");
-    }
-    int num = numerator * frc.getNumerator();
-    int den = denominator * frc.getDenominator();
-    return Fraction(num, den);
-}
-
-float Fraction::operator*(float num) {
-    double numer = static_cast<double>(numerator) * num;
-    return numer / denominator;
-}
-
-Fraction operator*(float num, const Fraction& frc) {
-    return frc * num;
-}
-
-Fraction operator*(const Fraction& frc, float num) {
-    return frc * num;
-}
-
-Fraction Fraction::operator/(const Fraction& frc) {
-    if (frc.getNumerator() == 0) {
-        throw std::runtime_error("Dividing by 0 is illegal!");
-    }
-    long long check1 = static_cast<long long>(numerator) * frc.getDenominator();
-    long long check2 = static_cast<long long>(denominator) * frc.getNumerator();
-    if (check1 > INT_MAX || check2 > INT_MAX || check1 < INT_MIN || check2 < INT_MIN) {
-        throw std::overflow_error("Note we're using INTEGERS");
-    }
-    int num = numerator * frc.getDenominator();
-    int den = denominator * frc.getNumerator();
-    return Fraction(num, den);
-}
-
-float Fraction::operator/(float num) {
-    if (num == 0) {
-        throw std::runtime_error("Dividing by 0 is illegal!");
-    }
-    float current = static_cast<float>(numerator) / denominator;
-    float ans = current / num;
-    return ans;
-}
-
-Fraction operator/(float num, const Fraction& frc) {
-    if (frc.getNumerator() == 0) {
-        throw std::runtime_error("Dividing by 0 is illegal!");
-    }
-    float frcValue = static_cast<float>(frc.getNumerator()) / frc.getDenominator();
-    float ans = num / frcValue;
-    return Fraction(ans);
-}
-
-bool Fraction::operator==(const Fraction& frc) const {
-    if (this->numerator == 0 && frc.getNumerator() == 0) {
-        return true;
-    }
-    double ans1 = std::round(static_cast<double>(numerator) / denominator * 1000) / 1000.0;
-    double ans2 = std::round(static_cast<double>(frc.getNumerator()) / frc.getDenominator() * 1000) / 1000.0;
-    return ans1 == ans2;
-}
-
-bool Fraction::operator==(const float& num) const {
-    double ans1 = std::round(static_cast<double>(numerator) / denominator * 1000) / 1000.0;
-    double ans2 = std::round(num * 1000) / 1000.0;
-    return ans1 == ans2;
-}
-
-bool Fraction::operator<=(const Fraction& frc) const {
-    return (numerator * frc.getDenominator()) <= (frc.getNumerator() * denominator);
-}
-
-bool Fraction::operator<=(float num) const {
-    return numerator <= num * denominator;
-}
-
-bool operator<=(const float& num, const Fraction& frc) {
-    return frc >= num;
-}
-
-bool Fraction::operator<(const Fraction& frc) const {
-    return (numerator * frc.getDenominator()) < (frc.getNumerator() * denominator);
-}
-
-bool Fraction::operator<(float num) const {
-    return numerator < num * denominator;
-}
-
-bool operator<(const float& num, const Fraction& frc) {
-    return frc > num;
-}
-
-bool Fraction::operator>=(const Fraction& frc) const {
-    return (numerator * frc.getDenominator()) >= (frc.getNumerator() * denominator);
-}
-
-bool Fraction::operator>=(float num) const {
-    return numerator >= num * denominator;
-}
-
-bool operator>=(const float& num, const Fraction& frc) {
-    return frc <= num;
-}
-
-bool Fraction::operator>(const Fraction& frc) const {
-    return (numerator * frc.getDenominator()) > (frc.getNumerator() * denominator);
-}
-
-bool Fraction::operator>(float num) const {
-    return numerator > num * denominator;
-}
-
-bool operator>(const float& num, const Fraction& frc) {
-    return frc < num;
-}
-
-Fraction& Fraction::operator++() {
-    numerator += denominator;
-    return *this;
-}
-
-Fraction Fraction::operator++(int) {
-    Fraction frc(*this); // Create a copy of the current fraction
-    numerator += denominator;
-    return frc;
-}
-
-Fraction& Fraction::operator--() {
-    numerator -= denominator;
-    return *this;
-}
-
-Fraction Fraction::operator--(int) {
-    Fraction frc(*this); // Create a copy of the current fraction
-    numerator -= denominator;
-    return frc;
-}
-
-std::ostream& operator<<(std::ostream& output, const Fraction& fraction) {
-    output << fraction.getNumerator() << '/' << fraction.getDenominator();
-    return output;
-}
-
-std::istream& operator>>(std::istream& input, Fraction& frc) {
-    std::string fractionString;
-    input >> fractionString;
-
-    std::istringstream iss(fractionString);
-    int numerator, denominator;
-    char separator;
-
-    if (!(iss >> numerator)) {
-        throw std::runtime_error("Invalid fraction format: missing numerator");
-    }
-    if (!(iss >> separator) || separator != '/') {
-        throw std::runtime_error("Invalid fraction format: missing or incorrect separator");
-    }
-    if (!(iss >> denominator)) {
-        throw std::runtime_error("Invalid fraction format: missing denominator");
-    }
-
-    if (denominator == 0) {
-        throw std::runtime_error("Invalid fraction: denominator cannot be zero");
-    }
-
-    frc.setNumerator(numerator);
-    frc.setDenominator(denominator);
-
-    return input;
-}
-
-
-
-
-
-
-
-
-
-
-
